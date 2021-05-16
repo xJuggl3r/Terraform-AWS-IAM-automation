@@ -1,0 +1,133 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 3.27"
+    }
+  }
+
+  required_version = ">= 0.14.9"
+}
+
+provider "aws" {
+  profile = "default"
+  region  = "us-west-1"
+}
+
+# Cria Policies e Grupo CloudAdmin
+
+resource "aws_iam_group" "CloudAdmin" {
+  name = "CloudAdmin"
+  path = "/users/"
+}
+
+resource "aws_iam_group_policy_attachment" "aws_config_fulladmin" {
+  group      = aws_iam_group.CloudAdmin.name
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+}
+
+# Cria Policies e Grupo DBA
+
+resource "aws_iam_group" "DBA" {
+  name = "DBA"
+  path = "/users/"
+}
+
+resource "aws_iam_group_policy_attachment" "aws_config_DBA" {
+  group      = aws_iam_group.DBA.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
+}
+
+# Cria Policies e Grupo LinuxAdmin
+
+resource "aws_iam_group" "LinuxAdmin" {
+  name = "LinuxAdmin"
+  path = "/users/"
+}
+
+resource "aws_iam_group_policy_attachment" "aws_config_LixAdmin" {
+  group      = aws_iam_group.LinuxAdmin.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
+}
+
+
+# Cria Policies e Grupo RedesAdmin
+resource "aws_iam_group" "RedesAdmin" {
+  name = "RedesAdmin"
+  path = "/users/"
+}
+
+resource "aws_iam_group_policy_attachment" "aws_config_RedesAdmin" {
+  group      = aws_iam_group.RedesAdmin.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonVPCFullAccess"
+}
+
+
+# Cria Policies e Grupo Estagiários
+
+resource "aws_iam_group" "Estagiarios" {
+  name = "Estagiarios"
+  path = "/users/"
+}
+
+resource "aws_iam_group_policy_attachment" "aws_config_estagiarios" {
+  group      = aws_iam_group.Estagiarios.name
+  policy_arn = "arn:aws:iam::aws:policy/ReadOnlyAccess"
+}
+
+
+# Enforce MFA
+
+module "aws-enforce-mfa" {
+  source = "jeromegamez/enforce-mfa/aws"
+  groups = [aws_iam_group.CloudAdmin.name, aws_iam_group.DBA.name, aws_iam_group.LinuxAdmin.name, aws_iam_group.RedesAdmin.name, aws_iam_group.Estagiarios.name]
+  #users  = [aws_iam_user.mfa_user.name]
+}
+
+
+# Lê o arquivo csv e transforma em map para ser consumido
+locals {
+  csv_data = file("${path.module}/usuarios2.csv")
+  myData    = csvdecode(local.csv_data)
+}
+
+output myData {
+  value = aws_iam_user.usuarios
+}
+
+# Cria os usuários
+resource "aws_iam_user" "usuarios" {
+  for_each = { for usuario in local.myData : usuario.usuarios => usuario }
+  name     = each.value.usuarios
+}
+
+# Atribui senhas aos users
+resource "aws_iam_user_login_profile" "add-pass" {
+  for_each = aws_iam_user.usuarios
+  user     = each.value.name
+  pgp_key  = "keybase:each.value.name"
+}
+
+
+## OLD CODE
+# resource "aws_iam_user_login_profile" "add-pass" {
+#   for_each = { for newPass in local.users : newPass.senha => newPass... }
+#   user     = each.value.usuarios #PROBLEM HERE! IT GENERATES A TUPLE BUT I ONLY WANT 1 USER PER LOOP!!
+#   pgp_key  = "keybase:$user" 
+
+#   output "password" {
+#     value = aws_iam_user_login_profile.example.encrypted_password
+#   }
+# }
+## OLD CODE END ##
+
+#Add users em seus respectivos grupos
+resource "aws_iam_user_group_membership" "add-group" {
+  for_each = { for newGroup in local.myData : newGroup.grupo => newGroup }
+
+  user = each.value.usuarios
+  groups = [
+    each.value.grupo,
+  ]
+
+}

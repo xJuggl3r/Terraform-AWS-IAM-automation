@@ -9,7 +9,7 @@ resource "aws_iam_group_policy_attachment" "aws_config_DBA" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
 }
 
-resource "aws_iam_group_policy_attachment" "aws_config_LixAdmin" {
+resource "aws_iam_group_policy_attachment" "aws_config_LinuxAdmin" {
   group      = aws_iam_group.LinuxAdmin.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
 }

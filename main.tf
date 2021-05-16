@@ -21,10 +21,10 @@ resource "aws_iam_group" "CloudAdmin" {
   path = "/users/"
 }
 
-resource "aws_iam_group_policy_attachment" "aws_config_fulladmin" {
-  group      = aws_iam_group.CloudAdmin.name
-  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
-}
+# resource "aws_iam_group_policy_attachment" "aws_config_fulladmin" {
+#   group      = aws_iam_group.CloudAdmin.name
+#   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+# }
 
 # Cria Policies e Grupo DBA
 
@@ -33,10 +33,10 @@ resource "aws_iam_group" "DBA" {
   path = "/users/"
 }
 
-resource "aws_iam_group_policy_attachment" "aws_config_DBA" {
-  group      = aws_iam_group.DBA.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
-}
+# resource "aws_iam_group_policy_attachment" "aws_config_DBA" {
+#   group      = aws_iam_group.DBA.name
+#   policy_arn = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
+# }
 
 # Cria Policies e Grupo LinuxAdmin
 
@@ -45,10 +45,10 @@ resource "aws_iam_group" "LinuxAdmin" {
   path = "/users/"
 }
 
-resource "aws_iam_group_policy_attachment" "aws_config_LixAdmin" {
-  group      = aws_iam_group.LinuxAdmin.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
-}
+# resource "aws_iam_group_policy_attachment" "aws_config_LixAdmin" {
+#   group      = aws_iam_group.LinuxAdmin.name
+#   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
+# }
 
 
 # Cria Policies e Grupo RedesAdmin
@@ -57,10 +57,10 @@ resource "aws_iam_group" "RedesAdmin" {
   path = "/users/"
 }
 
-resource "aws_iam_group_policy_attachment" "aws_config_RedesAdmin" {
-  group      = aws_iam_group.RedesAdmin.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonVPCFullAccess"
-}
+# resource "aws_iam_group_policy_attachment" "aws_config_RedesAdmin" {
+#   group      = aws_iam_group.RedesAdmin.name
+#   policy_arn = "arn:aws:iam::aws:policy/AmazonVPCFullAccess"
+# }
 
 
 # Cria Policies e Grupo Estagiários
@@ -69,10 +69,10 @@ resource "aws_iam_group" "Estagiarios" {
   path = "/users/"
 }
 
-resource "aws_iam_group_policy_attachment" "aws_config_Estagiarios" {
-  group      = aws_iam_group.Estagiarios.name
-  policy_arn = "arn:aws:iam::aws:policy/ReadOnlyAccess"
-}
+# resource "aws_iam_group_policy_attachment" "aws_config_Estagiarios" {
+#   group      = aws_iam_group.Estagiarios.name
+#   policy_arn = "arn:aws:iam::aws:policy/ReadOnlyAccess"
+# }
 
 
 # Enforce MFA
@@ -83,9 +83,9 @@ module "aws-enforce-mfa" {
   #users  = [aws_iam_user.mfa_user.name]
 }
 
-# Cria users e senhas from .csv, add to groups
-resource "null_resource" "Add-users-pass" {
- provisioner "local-exec" {
-    command = "/bin/bash chmod +x ./cria-users.sh || ./aws-iam-cria-usuario.sh usuarios2.csv"
-  }
-}
+# # Cria users e senhas from .csv, add to groups
+# resource "null_resource" "Add-users-pass" {
+#  provisioner "local-exec" {
+#     command = "/bin/bash chmod +x ./cria-users.sh || ./aws-iam-cria-usuario.sh usuarios2.csv"
+#   }
+# }

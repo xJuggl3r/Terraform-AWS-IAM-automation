@@ -11,36 +11,83 @@ terraform {
 
 provider "aws" {
   profile = "default"
-  region  = "us-east-1"
+  region  = "us-west-1"
+}
+
+# Cria Policies e Grupo CloudAdmin
+
+resource "aws_iam_group" "CloudAdmin" {
+  name = "CloudAdmin"
+  path = "/users/"
+}
+
+resource "aws_iam_group_policy_attachment" "aws_config_fulladmin" {
+  group      = aws_iam_group.CloudAdmin.name
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+}
+
+# Cria Policies e Grupo DBA
+
+resource "aws_iam_group" "DBA" {
+  name = "DBA"
+  path = "/users/"
+}
+
+resource "aws_iam_group_policy_attachment" "aws_config_DBA" {
+  group      = aws_iam_group.DBA.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
+}
+
+# Cria Policies e Grupo LinuxAdmin
+
+resource "aws_iam_group" "LinuxAdmin" {
+  name = "LinuxAdmin"
+  path = "/users/"
+}
+
+resource "aws_iam_group_policy_attachment" "aws_config_LixAdmin" {
+  group      = aws_iam_group.LinuxAdmin.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
 }
 
 
-# Lê o arquivo csv e transforma em map para ser consumido
-locals {
-  csv_data = file("${path.module}/usuarios2.csv")
-  users    = csvdecode(local.csv_data)
+# Cria Policies e Grupo RedesAdmin
+resource "aws_iam_group" "RedesAdmin" {
+  name = "RedesAdmin"
+  path = "/users/"
 }
 
-# Cria os usuários
-resource "aws_iam_user" "usuarios" {
-  for_each = { for usuario in local.users : usuario.usuarios => usuario }
-  name     = each.value.usuarios
+resource "aws_iam_group_policy_attachment" "aws_config_RedesAdmin" {
+  group      = aws_iam_group.RedesAdmin.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonVPCFullAccess"
 }
 
-# Atribui senhas aos users
-resource "aws_iam_user_login_profile" "add-pass" {
-  for_each = aws_iam_user.usuarios
-  user     = each.value.name
-  pgp_key  = "keybase:${each.value.name}"
+
+# Cria Policies e Grupo Estagiários
+
+resource "aws_iam_group" "Estagiarios" {
+  name = "Estagiarios"
+  path = "/users/"
 }
 
-#Add users em seus respectivos grupos
-resource "aws_iam_user_group_membership" "add-group" {
-  for_each = { for newGroup in local.users : newGroup.grupo => newGroup }
+resource "aws_iam_group_policy_attachment" "aws_config_estagiarios" {
+  group      = aws_iam_group.Estagiarios.name
+  policy_arn = "arn:aws:iam::aws:policy/ReadOnlyAccess"
+}
 
-  user = each.value.usuarios
-  groups = [
-    each.value.grupo,
-  ]
 
+# Enforce MFA
+
+module "aws-enforce-mfa" {
+  source = "jeromegamez/enforce-mfa/aws"
+  groups = [aws_iam_group.CloudAdmin.name, aws_iam_group.DBA.name, aws_iam_group.LinuxAdmin.name, aws_iam_group.RedesAdmin.name, aws_iam_group.Estagiarios.name]
+  #users  = [aws_iam_user.mfa_user.name]
+}
+
+resource "null_resource" "Add-users-pass" {
+
+ provisioner "local-exec" {
+
+    command = "/bin/bash chmod +x ./cria-users.sh || ./cria-users.sh"
+  }
 }

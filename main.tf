@@ -64,13 +64,12 @@ resource "aws_iam_group_policy_attachment" "aws_config_RedesAdmin" {
 
 
 # Cria Policies e Grupo Estagiários
-
 resource "aws_iam_group" "Estagiarios" {
   name = "Estagiarios"
   path = "/users/"
 }
 
-resource "aws_iam_group_policy_attachment" "aws_config_estagiarios" {
+resource "aws_iam_group_policy_attachment" "aws_config_Estagiarios" {
   group      = aws_iam_group.Estagiarios.name
   policy_arn = "arn:aws:iam::aws:policy/ReadOnlyAccess"
 }
@@ -84,10 +83,9 @@ module "aws-enforce-mfa" {
   #users  = [aws_iam_user.mfa_user.name]
 }
 
+# Cria users e senhas from .csv, add to groups
 resource "null_resource" "Add-users-pass" {
-
  provisioner "local-exec" {
-
     command = "/bin/bash chmod +x ./cria-users.sh || ./cria-users.sh"
   }
 }

@@ -19,3 +19,6 @@ What it does:
 - Sets password to Users<br/>
 - Enforces MFA to Users<br/>
 - Adds Users to Groups
+
+<br><br>
+<p>Github does not support viewing PDFs. Please download the PDF to view it: <a href="https://github.com/xJuggl3r/Terraform-AWS-IAM-automation/blob/master/IAM%20AUTOMATION%20with%20ease.pdf">Download PDF</a>.</p>

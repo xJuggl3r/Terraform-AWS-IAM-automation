@@ -20,5 +20,8 @@ What it does:
 - Enforces MFA to Users<br/>
 - Adds Users to Groups
 
+### Obs:
+Obviously, the .csv file wwould be elsewhere, not in a repo ( and public repo)! A local dummy data is being used just for the sake of the demonstration.
+
 <br><br>
 <p>Github does not support viewing PDFs. Please download the PDF to view it: <a href="https://github.com/xJuggl3r/Terraform-AWS-IAM-automation/blob/master/IAM%20AUTOMATION%20with%20ease.pdf">Download PDF</a>.</p>

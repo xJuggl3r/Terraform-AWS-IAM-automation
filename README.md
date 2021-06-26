@@ -1,6 +1,6 @@
 ## CSV2MAP
 
-### A small IaaC to migrate on-prem users to AWS using Terraform
+### A small IaC to migrate on-prem users to AWS using Terraform
 ***
 <br/>
 
